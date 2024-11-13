@@ -1,12 +1,14 @@
 #include "board.h"
+#include "game.h"
+#include "utils.h"
 #include <iostream>
 
 using namespace std;
 int main() {
     cout << "Program starting..." << endl;
 
-    Board board;
-    board.init();
+    Game game;
+    game.init();
 
     return 0;
 }
