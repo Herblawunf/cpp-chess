@@ -13,5 +13,5 @@ struct move {
     Piece piece;
     int from;
     int to;
-
+    MoveType type;
 };
