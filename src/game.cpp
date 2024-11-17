@@ -20,3 +20,7 @@ bool Game::makeMove(struct move move) {
 
     return true;
 }
+
+void Game::printBoard() {
+    std::cout << board;
+}

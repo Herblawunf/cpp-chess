@@ -10,5 +10,7 @@ int main() {
     Game game;
     game.init();
 
+    game.printBoard();
+
     return 0;
 }

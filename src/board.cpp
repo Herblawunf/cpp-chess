@@ -26,7 +26,7 @@ void Board::init() {
 
 // Checks if there is a piece at an index from 0 to 63 inclusive
 // a1 -> 0, a2 -> 1, ... , b1 -> 8, ... h8 -> 63
-bool Board::pieceAtIndex(int index) {
+bool Board::pieceAtIndex(int index) const {
     if (index < 0 || index > 63) {
         return false;
     }
@@ -39,4 +39,46 @@ bool Board::pieceAtIndex(int index) {
         }
     }
     return false;
+}
+
+std::pair<Colour, Piece> Board::pieceAt(int index) const {
+    if (index < 0 || index > 63) {
+        throw std::invalid_argument("Index out of range");
+    }
+
+    uint64_t mask = 1ULL << index;
+
+    for (const auto& [piece, bitboard] : bitboards) {
+        if (bitboard & mask) {
+            return piece;
+        }
+    }
+    throw std::invalid_argument("No Piece at index");
+}
+
+std::ostream& operator << (std::ostream &os, const Board &b) {
+    return (os << b.toString());
+}
+
+std::string Board::toString() const {
+    std::string ret = "  A B C D E F G H  \n";
+
+    for (int row = 7; row >= 0; row--) {
+        ret.append(std::to_string(row + 1) + " ");
+        for (int col = 0; col < 8; col++) {
+            int index = row * 8 + col;
+
+            if (this->pieceAtIndex(index)) {
+                ret.append(getPieceCharacter(this->pieceAt(index)));
+            } else {
+                ret.append(".");
+            }
+            ret.append(" ");
+        }
+        ret.append(std::to_string(row) + "\n");
+    }
+
+    ret.append("  A B C D E F G H  \n");
+
+    return ret;
 }
