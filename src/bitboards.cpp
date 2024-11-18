@@ -97,3 +97,7 @@ Bitboard exploreStraight(Bitboard from, Bitboard to) {
     // Otherwise there is no straight path between the two points
     return 0;
 }
+
+Bitboard rankMask(int sq) {return  0xff << (sq & 56);}
+
+Bitboard fileMask(int sq) {return 0x0101010101010101 << (sq & 7);}

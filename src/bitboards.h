@@ -17,3 +17,7 @@ Bitboard noWeOne (Bitboard b);
 Bitboard indexBoard(int index);
 
 Bitboard exploreStraight(Bitboard from, Bitboard to);
+
+Bitboard rankMask(int sq);
+
+Bitboard fileMask(int sq);

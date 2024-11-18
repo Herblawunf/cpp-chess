@@ -65,7 +65,7 @@ std::string Board::toString() const {
             }
             ret.append(" ");
         }
-        ret.append(std::to_string(row) + "\n");
+        ret.append(std::to_string(row + 1) + "\n");
     }
 
     ret.append("  A B C D E F G H  \n");

@@ -9,7 +9,7 @@ using namespace std;
 int main() {
     cout << "Program starting..." << endl;
 
-    cout << exploreStraight(0b100000000, 0b1000000000000000LL) << endl;
+
 
     TwoPlayerGame game;
 

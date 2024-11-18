@@ -104,9 +104,11 @@ bool Game::moveValid(struct move move) {
             return false;
         }
 
+        std::cout << between << std::endl << board.empty << std::endl;
+
         if (move.type == Peaceful) {
             // There should be no pieces along the path
-            if (((between ^ move.to) & board.empty) != (between ^ move.to)) {
+            if (((between ^ move.from) & board.empty) != (between ^ move.from)) {
                 return false;
             }
         } else if (move.type == Capture) {
@@ -142,8 +144,8 @@ bool Game::makeMove(struct move move) {
         board.bitboards[std::make_pair(move.colour, move.piece)] ^= move.from;
         board.bitboards[std::make_pair(move.colour, move.piece)] |= move.to;
 
-        board.empty ^= move.from;
-        board.empty |= move.to;
+        board.empty ^= move.to;
+        board.empty |= move.from;
     }
 
     turn = turn == Black ? White : Black;
@@ -154,14 +156,19 @@ void Game::printBoard() {
     std::cout << board;
 }
 
+std::map<char, Piece> pieceMap{{'K', King}, {'Q', Queen}, {'R', Rook}, {'B', Bishop}, {'K', Knight}};
+
 struct move Game::parseMove(std::string move) {
     Bitboard to;
+
+    try {
+        to = getSquare(move.substr(move.length() - 2, 2));
+    } catch (std::string e) {
+        throw std::invalid_argument("Square could not be parsed");
+    }
+
     if (move.length() == 2) {
-        try {
-            to = getSquare(move);
-        } catch (std::string e) {
-            throw std::invalid_argument("Square could not be parsed");
-        }
+        // The case where the move is a peaceful pawn move
 
         Bitboard from;
 
@@ -180,6 +187,21 @@ struct move Game::parseMove(std::string move) {
         }
 
         return {turn, Pawn, from, to, Peaceful};
+    } else if (move.length() == 3) {
+        // The case where the move is a peaceful move with a non-pawn piece
+        Piece piece = pieceMap[move[0]];
+        Bitboard from;
+
+        if (piece == Rook) {
+            int square = __builtin_ctzll(to);
+            Bitboard possibleFroms = rankMask(square) | fileMask(square);
+
+            from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+        } else {
+            from = 0;
+        }
+
+        return {turn, piece, from, to, Peaceful};
     }
 
     throw std::invalid_argument("Move could not be parsed");
