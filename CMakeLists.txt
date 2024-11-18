@@ -17,4 +17,5 @@ add_executable(cpp_chess
         src/game.cpp
         src/utils.cpp
         src/bitboards.cpp
+        src/twoPlayerGame.cpp
 )

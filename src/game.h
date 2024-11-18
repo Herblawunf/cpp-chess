@@ -11,6 +11,5 @@ public:
     bool moveValid(struct move move);
     struct move parseMove(std::string move);
     Board board;
-private:
     Colour turn;
 };

@@ -124,8 +124,13 @@ void Game::printBoard() {
 }
 
 struct move Game::parseMove(std::string move) {
+    Bitboard to;
     if (move.length() == 2) {
-        Bitboard to = getSquare(move);
+        try {
+            to = getSquare(move);
+        } catch (std::string e) {
+            throw std::invalid_argument("Square could not be parsed");
+        }
 
         Bitboard from;
 
@@ -139,12 +144,12 @@ struct move Game::parseMove(std::string move) {
             if (board.occupied(nortOne(to))) {
                 from = nortOne(to);
             } else {
-                from = nortOne(soutOne(to));
+                from = nortOne(nortOne(to));
             }
         }
 
         return {turn, Pawn, from, to, Peaceful};
     }
 
-    return {turn, Pawn, 0, 0, Peaceful};
+    throw std::invalid_argument("Move could not be parsed");
 }
