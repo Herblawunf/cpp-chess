@@ -122,3 +122,29 @@ bool Game::makeMove(struct move move) {
 void Game::printBoard() {
     std::cout << board;
 }
+
+struct move Game::parseMove(std::string move) {
+    if (move.length() == 2) {
+        Bitboard to = getSquare(move);
+
+        Bitboard from;
+
+        if (turn == White) {
+            if (board.occupied(soutOne(to))) {
+                from = soutOne(to);
+            } else {
+                from = soutOne(soutOne(to));
+            }
+        } else {
+            if (board.occupied(nortOne(to))) {
+                from = nortOne(to);
+            } else {
+                from = nortOne(soutOne(to));
+            }
+        }
+
+        return {turn, Pawn, from, to, Peaceful};
+    }
+
+    return {turn, Pawn, 0, 0, Peaceful};
+}

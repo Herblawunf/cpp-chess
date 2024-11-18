@@ -28,7 +28,7 @@ void Board::init() {
 
 // Checks if there is a piece at an index from 0 to 63 inclusive
 // a1 -> 0, a2 -> 1, ... , b1 -> 8, ... h8 -> 63
-bool Board::pieceAtIndex(Bitboard position) const {
+bool Board::occupied(Bitboard position) const {
     for (const auto& [piece, bitboard] : bitboards) {
         if (bitboard & position) {
             return true;
@@ -58,7 +58,7 @@ std::string Board::toString() const {
         for (int col = 0; col < 8; col++) {
             int index = row * 8 + col;
 
-            if (this->pieceAtIndex(1ULL << index)) {
+            if (this->occupied(1ULL << index)) {
                 ret.append(getPieceCharacter(this->pieceAt(1ULL << index)));
             } else {
                 ret.append(".");

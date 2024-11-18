@@ -13,15 +13,15 @@ int main() {
 
     game.printBoard();
 
-    struct move move = {White, Knight, 1 << 6, 1 << 21, Peaceful};
+    struct move move = game.parseMove("e4");
 
-    cout << game.makeMove(move) << endl;
+    game.makeMove(move);
 
     game.printBoard();
 
     struct move move2 = {Black, Pawn, 1ULL << 48, 1ULL << 40, Peaceful};
 
-    cout << game.makeMove(move2) << endl;
+    game.makeMove(move2);
 
     game.printBoard();
 

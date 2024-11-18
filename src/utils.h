@@ -7,6 +7,6 @@
 #include "move.h"
 #include "bitboards.h"
 
-int getSquareIndex(std::string square);
+Bitboard getSquare(std::string square);
 
 std::string getPieceCharacter(std::pair<Colour, Piece> p);

@@ -10,7 +10,7 @@ public:
     void printBoard();
     bool moveValid(struct move move);
     struct move parseMove(std::string move);
-private:
     Board board;
+private:
     Colour turn;
 };
