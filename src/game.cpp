@@ -96,6 +96,34 @@ bool Game::moveValid(struct move move) {
         if (move.type == Capture && (piece.first == move.colour || piece.first == NullColour)) {
             return false;
         }
+    } else if (move.piece == Rook) {
+        Bitboard between = exploreStraight(move.from, move.to);
+
+        // Invalid path between the two points, not a straight line
+        if (between == 0) {
+            return false;
+        }
+
+        if (move.type == Peaceful) {
+            // There should be no pieces along the path
+            if (((between ^ move.to) & board.empty) != (between ^ move.to)) {
+                return false;
+            }
+        } else if (move.type == Capture) {
+            // There should be no pieces in between the two pieces
+            if (((between ^ (move.to & move.from)) & board.empty) != (between ^ (move.to & move.from))) {
+                return false;
+            }
+
+            // An opposite coloured piece should be occupying the target square
+            if (piece.first == move.colour || piece.first == NullColour) {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
+
     } else {
             return false;
     }

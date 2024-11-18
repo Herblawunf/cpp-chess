@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 
 using Bitboard = uint64_t;
 
@@ -14,3 +15,5 @@ Bitboard soWeOne (Bitboard b);
 Bitboard noWeOne (Bitboard b);
 
 Bitboard indexBoard(int index);
+
+Bitboard exploreStraight(Bitboard from, Bitboard to);
