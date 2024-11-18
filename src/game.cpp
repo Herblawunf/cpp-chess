@@ -113,6 +113,9 @@ bool Game::makeMove(struct move move) {
     if (move.type == Peaceful) {
         board.bitboards[std::make_pair(move.colour, move.piece)] ^= move.from;
         board.bitboards[std::make_pair(move.colour, move.piece)] |= move.to;
+
+        board.empty ^= move.from;
+        board.empty |= move.to;
     }
 
     turn = turn == Black ? White : Black;
