@@ -66,4 +66,3 @@ std::string getPieceCharacter(std::pair<Colour, Piece> p) {
     }
     throw std::invalid_argument("Invalid colour");
 }
-

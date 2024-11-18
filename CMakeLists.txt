@@ -16,4 +16,5 @@ add_executable(cpp_chess
         src/main.cpp
         src/game.cpp
         src/utils.cpp
+        src/bitboards.cpp
 )

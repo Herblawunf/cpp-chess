@@ -8,8 +8,9 @@ public:
     void init();
     bool makeMove(struct move move);
     void printBoard();
+    bool moveValid(struct move move);
+    struct move parseMove(std::string move);
 private:
     Board board;
-    bool moveValid(struct move move);
     Colour turn;
 };

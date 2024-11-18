@@ -3,6 +3,7 @@
 enum Colour{
     White,
     Black,
+    NullColour,
 };
 
 enum Piece{
@@ -12,4 +13,5 @@ enum Piece{
     Rook,
     Queen,
     King,
+    NullPiece,
 };

@@ -22,38 +22,28 @@ void Board::init() {
 
     bitboards[std::make_pair(White, King)] = 0b10000;
     bitboards[std::make_pair(Black, King)] = 0b10000ULL << 56;
+
+    empty = 0x0000FFFFFFFF0000ULL;
 }
 
 // Checks if there is a piece at an index from 0 to 63 inclusive
 // a1 -> 0, a2 -> 1, ... , b1 -> 8, ... h8 -> 63
-bool Board::pieceAtIndex(int index) const {
-    if (index < 0 || index > 63) {
-        return false;
-    }
-
-    uint64_t mask = 1ULL << index;
-
+bool Board::pieceAtIndex(Bitboard position) const {
     for (const auto& [piece, bitboard] : bitboards) {
-        if (bitboard & mask) {
+        if (bitboard & position) {
             return true;
         }
     }
     return false;
 }
 
-std::pair<Colour, Piece> Board::pieceAt(int index) const {
-    if (index < 0 || index > 63) {
-        throw std::invalid_argument("Index out of range");
-    }
-
-    uint64_t mask = 1ULL << index;
-
+std::pair<Colour, Piece> Board::pieceAt(Bitboard position) const {
     for (const auto& [piece, bitboard] : bitboards) {
-        if (bitboard & mask) {
+        if (bitboard & position) {
             return piece;
         }
     }
-    throw std::invalid_argument("No Piece at index");
+    return std::make_pair(NullColour, NullPiece);
 }
 
 std::ostream& operator << (std::ostream &os, const Board &b) {
@@ -68,8 +58,8 @@ std::string Board::toString() const {
         for (int col = 0; col < 8; col++) {
             int index = row * 8 + col;
 
-            if (this->pieceAtIndex(index)) {
-                ret.append(getPieceCharacter(this->pieceAt(index)));
+            if (this->pieceAtIndex(1ULL << index)) {
+                ret.append(getPieceCharacter(this->pieceAt(1ULL << index)));
             } else {
                 ret.append(".");
             }

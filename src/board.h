@@ -6,16 +6,16 @@
 #include <map>
 #include <iostream>
 #include "utils.h"
-
-using Bitboard = uint64_t;
+#include "bitboards.h"
 
 class Board{
 public:
     void init();
-    bool pieceAtIndex(int index) const;
+    bool pieceAtIndex(Bitboard position) const;
     friend std::ostream& operator << (std::ostream &os, const Board &b);
-private:
+    std::pair<Colour, Piece> pieceAt(Bitboard position) const;
     std::map<std::pair<enum Colour, enum Piece>, Bitboard> bitboards;
+    Bitboard empty;
+private:
     std::string toString() const;
-    std::pair<Colour, Piece> pieceAt(int index) const;
 };

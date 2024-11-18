@@ -4,6 +4,8 @@
 #include <stdexcept>
 
 #include "piece.h"
+#include "move.h"
+#include "bitboards.h"
 
 int getSquareIndex(std::string square);
 
