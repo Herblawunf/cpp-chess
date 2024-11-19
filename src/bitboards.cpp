@@ -199,3 +199,11 @@ Bitboard antiDiagMask(int sq) {
     int sout =  diag & (-diag >> 31);
     return (maindia >> sout) << nort;
 }
+
+Bitboard knightMask(int sq) {
+    Bitboard b = 1ULL << sq;
+
+    return nortOne(noEaOne(b)) | eastOne(noEaOne(b)) | eastOne(soEaOne(b)) | soutOne(soEaOne(b)) | soutOne(soWeOne(b))
+        | westOne(soWeOne(b)) | westOne(noWeOne(b)) | nortOne(noWeOne(b));
+
+}

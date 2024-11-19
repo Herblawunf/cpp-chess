@@ -222,7 +222,7 @@ void Game::printBoard() const {
     std::cout << board;
 }
 
-std::map<char, Piece> pieceMap{{'K', King}, {'Q', Queen}, {'R', Rook}, {'B', Bishop}, {'K', Knight}};
+std::map<char, Piece> pieceMap{{'K', King}, {'Q', Queen}, {'R', Rook}, {'B', Bishop}, {'N', Knight}};
 
 struct move Game::parseMove(std::string move) {
     Bitboard to;
@@ -273,6 +273,11 @@ struct move Game::parseMove(std::string move) {
             Bitboard possibleFroms = rankMask(square) | fileMask(square) | diagonalMask(square) | antiDiagMask(square);
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+        } else if (piece == Knight) {
+            int square = __builtin_ctzll(to);
+            Bitboard possibleFroms = knightMask(square);
+
+            from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
         } else {
             from = 0;
         }
@@ -294,6 +299,11 @@ struct move Game::parseMove(std::string move) {
             } else if (piece == Bishop) {
                 int square = __builtin_ctzll(to);
                 Bitboard possibleFroms = diagonalMask(square) | antiDiagMask(square);
+
+                from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+            } else if (piece == Queen) {
+                int square = __builtin_ctzll(to);
+                Bitboard possibleFroms = rankMask(square) | fileMask(square) | diagonalMask(square) | antiDiagMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
             } else {

@@ -27,3 +27,5 @@ Bitboard fileMask(int sq);
 Bitboard diagonalMask(int sq);
 
 Bitboard antiDiagMask(int sq);
+
+Bitboard knightMask(int sq);
