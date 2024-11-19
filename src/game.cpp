@@ -491,6 +491,8 @@ struct move Game::parseMove(std::string move) {
             Bitboard possibleFroms = knightMask(square);
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+        } else if (piece == King) {
+            from = board.bitboards[std::make_pair(turn, piece)];
         } else {
             from = 0;
         }
@@ -573,6 +575,8 @@ struct move Game::parseMove(std::string move) {
                 Bitboard possibleFroms = knightMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+            } else if (piece == King) {
+                from = board.bitboards[std::make_pair(turn, piece)];
             } else {
                 // Assumes it is a pawn capture
                 char file = move[0];
@@ -583,6 +587,7 @@ struct move Game::parseMove(std::string move) {
 
             return {turn, piece, from, to, Capture, NullPiece};
         } else if (move.find('=') != std::string::npos) {
+            // Promotion case
             try {
                 to = getSquare(move.substr(0, 2));
             } catch (std::string e) {
