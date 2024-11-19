@@ -98,6 +98,104 @@ Bitboard exploreStraight(Bitboard from, Bitboard to) {
     return 0;
 }
 
+Bitboard exploreDiagonal(Bitboard from, Bitboard to) {
+    if (from == to) {
+        return 0;
+    }
+
+    Bitboard explore = from;
+
+    // First explore north east
+    Bitboard noEa = 0;
+    while (true) {
+        noEa |= explore;
+        if (explore == 0) {
+            noEa = 0;
+            break;
+        }
+        if (explore == to) {
+            break;
+        }
+        explore = noEaOne(explore);
+    }
+    if (noEa != 0) {
+        return noEa;
+    }
+    explore = from;
+
+    // Now explore south east
+    Bitboard soEa = 0;
+    while (true) {
+        soEa |= explore;
+        if (explore == 0) {
+            soEa = 0;
+            break;
+        }
+        if (explore == to) {
+            break;
+        }
+        explore = soEaOne(explore);
+    }
+    if (soEa != 0) {
+        return soEa;
+    }
+    explore = from;
+
+    // Now explore south west
+    Bitboard soWe = 0;
+    while (true) {
+        soWe |= explore;
+        if (explore == 0) {
+            soWe = 0;
+            break;
+        }
+        if (explore == to) {
+            break;
+        }
+        explore = soWeOne(explore);
+    }
+    if (soWe != 0) {
+        return soWe;
+    }
+    explore = from;
+
+    // Lastly explore west
+    Bitboard noWe = 0;
+    while (true) {
+        noWe |= explore;
+        if (explore == 0) {
+            noWe = 0;
+            break;
+        }
+        if (explore == to) {
+            break;
+        }
+        explore = noWeOne(explore);
+    }
+    if (noWe != 0) {
+        return noWe;
+    }
+
+    // Otherwise there is no diagonal path between the two points
+    return 0;
+}
+
 Bitboard rankMask(int sq) {return  0xff << (sq & 56);}
 
 Bitboard fileMask(int sq) {return 0x0101010101010101 << (sq & 7);}
+
+Bitboard diagonalMask(int sq) {
+    const Bitboard maindia = Bitboard(0x8040201008040201);
+    int diag =8*(sq & 7) - (sq & 56);
+    int nort = -diag & ( diag >> 31);
+    int sout =  diag & (-diag >> 31);
+    return (maindia >> sout) << nort;
+}
+
+Bitboard antiDiagMask(int sq) {
+    const Bitboard maindia = Bitboard(0x0102040810204080);
+    int diag =56- 8*(sq&7) - (sq&56);
+    int nort = -diag & ( diag >> 31);
+    int sout =  diag & (-diag >> 31);
+    return (maindia >> sout) << nort;
+}

@@ -18,6 +18,12 @@ Bitboard indexBoard(int index);
 
 Bitboard exploreStraight(Bitboard from, Bitboard to);
 
+Bitboard exploreDiagonal(Bitboard from, Bitboard to);
+
 Bitboard rankMask(int sq);
 
 Bitboard fileMask(int sq);
+
+Bitboard diagonalMask(int sq);
+
+Bitboard antiDiagMask(int sq);
