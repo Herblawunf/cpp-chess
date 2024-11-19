@@ -88,7 +88,7 @@ bool Game::moveValid(struct move move) {
 
     } else if (move.piece == Pawn) {
         // Pawn must promote when moving to the final rank
-        if (move.to & (move.colour == White ? 0xFF00000000000000 : 0xFF) && move.type != Promotion) {
+        if (move.to & (move.colour == White ? 0xFF00000000000000 : 0xFF) && move.type != Promotion && move.type != PromotionCapture) {
             return false;
         }
 
@@ -132,6 +132,22 @@ bool Game::moveValid(struct move move) {
 
             if (!(move.to & board.empty)) {
                 // Target square not empty
+                return false;
+            }
+        } else if (move.type == PromotionCapture) {
+            // Can only capture diagonally
+            Bitboard validPositions = move.colour == White ? noWeOne(move.from) | noEaOne(move.from) : soWeOne(move.from) | soEaOne(move.from);
+            if (!(move.to & validPositions)) {
+                return false;
+            }
+
+            // Must be moving onto the final rank
+            if (!(move.to & (move.colour == White ? 0xFFULL << 56 : 0xFF))) {
+                return false;
+            }
+
+            // Target square must be occupied by opposite colour piece
+            if (piece.first == move.colour || piece.first == NullColour) {
                 return false;
             }
         } else {
@@ -310,6 +326,18 @@ bool Game::makeMove(struct move move) {
         board.bitboards[std::make_pair(move.colour, move.promotionPiece)] |= move.to;
 
         board.empty ^= move.to;
+        board.empty |= move.from;
+    } else if (move.type == PromotionCapture) {
+        board.bitboards[std::make_pair(move.colour, Pawn)] ^= move.from;
+        board.bitboards[std::make_pair(move.colour, move.promotionPiece)] |= move.to;
+
+        for (int p = Pawn; p <= King; p++) {
+            if (board.bitboards[std::make_pair(opposite(move.colour), static_cast<Piece>(p))] & move.to) {
+                board.bitboards[std::make_pair(opposite(move.colour), static_cast<Piece>(p))] ^= move.to;
+                break;
+            }
+        }
+
         board.empty |= move.from;
     }
 
@@ -517,6 +545,23 @@ struct move Game::parseMove(std::string move) {
             Bitboard from = turn == White ? to >> 8 : to << 8;
 
             return {turn, Pawn, from, to, Promotion, promoPiece};
+        }
+    } else if (move.length() == 6) {
+        // Case where it is a capture promotion
+
+        if (move.find('x') != std::string::npos && move.find('=') != std::string::npos) {
+            try {
+                to = getSquare(move.substr(2, 2));
+            } catch (std::string e) {
+                throw std::invalid_argument("Square could not be parsed");
+            }
+            Piece promoPiece = pieceMap[move[5]];
+
+            char file = move[0];
+            Bitboard possibleFroms = turn == White ? soWeOne(to) | soEaOne(to) : noWeOne(to) | noEaOne(to);
+            Bitboard from = possibleFroms & fileMask((int)file - (int)'a');
+
+            return {turn, Pawn, from, to, PromotionCapture, promoPiece};
         }
     }
 

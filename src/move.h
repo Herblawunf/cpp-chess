@@ -8,6 +8,7 @@ enum MoveType {
     Capture,
     Promotion,
     Castle,
+    PromotionCapture,
 };
 
 struct move {
