@@ -148,9 +148,38 @@ bool Game::moveValid(struct move move) {
                 return false;
             }
 
-        } else {
+        }  else {
             return false;
         }
+
+    } else if (move.piece == Queen) {
+        Bitboard between = exploreStraight(move.from, move.to) | exploreDiagonal(move.from, move.to);
+
+        // Invalid path between the two points, not a straight line
+        if (between == 0) {
+            return false;
+        }
+
+        if (move.type == Peaceful) {
+            // There should be no pieces along the path
+            if (((between ^ move.from) & board.empty) != (between ^ move.from)) {
+                return false;
+            }
+        } else if (move.type == Capture) {
+            // There should be no pieces in between the two pieces
+            if (((between ^ (move.to | move.from)) & board.empty) != (between ^ (move.to | move.from))) {
+                return false;
+            }
+
+            // An opposite coloured piece should be occupying the target square
+            if (piece.first == move.colour || piece.first == NullColour) {
+                return false;
+            }
+
+        }  else {
+            return false;
+        }
+
     } else {
         return false;
     }
@@ -237,6 +266,11 @@ struct move Game::parseMove(std::string move) {
         } else if (piece == Bishop) {
             int square = __builtin_ctzll(to);
             Bitboard possibleFroms = diagonalMask(square) | antiDiagMask(square);
+
+            from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+        } else if (piece == Queen) {
+            int square = __builtin_ctzll(to);
+            Bitboard possibleFroms = rankMask(square) | fileMask(square) | diagonalMask(square) | antiDiagMask(square);
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
         } else {
