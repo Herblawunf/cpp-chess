@@ -87,6 +87,11 @@ bool Game::moveValid(struct move move) {
         }
 
     } else if (move.piece == Pawn) {
+        // Pawn must promote when moving to the final rank
+        if (move.to & (move.colour == White ? 0xFF00000000000000 : 0xFF) && move.type != Promotion) {
+            return false;
+        }
+
         if (move.type == Peaceful) {
             if (!(move.to & board.empty)) {
                 // Target square not empty
