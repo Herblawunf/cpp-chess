@@ -51,7 +51,7 @@ bool Game::moveValid(struct move move) {
             }
         } else if (move.type == Capture) {
             // Can only capture diagonally
-            Bitboard validPositions = move.colour == White ? noWeOne(move.from) & noEaOne(move.from) : soWeOne(move.from) | soEaOne(move.from);
+            Bitboard validPositions = move.colour == White ? noWeOne(move.from) | noEaOne(move.from) : soWeOne(move.from) | soEaOne(move.from);
             if (!(move.to & validPositions)) {
                 return false;
             }
@@ -288,7 +288,8 @@ struct move Game::parseMove(std::string move) {
 
         if (move.find('x') != std::string::npos) {
             // Capture case
-            Piece piece = pieceMap[move[0]];
+
+            Piece piece = pieceMap.find(move[0]) != pieceMap.end() ? pieceMap[move[0]] : Pawn;
             Bitboard from;
 
             if (piece == Rook) {
@@ -306,8 +307,17 @@ struct move Game::parseMove(std::string move) {
                 Bitboard possibleFroms = rankMask(square) | fileMask(square) | diagonalMask(square) | antiDiagMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+            } else if (piece == Knight) {
+                int square = __builtin_ctzll(to);
+                Bitboard possibleFroms = knightMask(square);
+
+                from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
             } else {
-                from = 0;
+                // Assumes it is a pawn capture
+                char file = move[0];
+                Bitboard possibleFroms = turn == White ? soWeOne(to) | soEaOne(to) : noWeOne(to) | noEaOne(to);
+
+                from = possibleFroms & fileMask((int)file - (int)'a');
             }
 
             return {turn, piece, from, to, Capture};
