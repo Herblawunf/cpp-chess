@@ -257,6 +257,11 @@ struct move Game::parseMove(std::string move) {
                 Bitboard possibleFroms = rankMask(square) | fileMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+            } else if (piece == Bishop) {
+                int square = __builtin_ctzll(to);
+                Bitboard possibleFroms = diagonalMask(square) | antiDiagMask(square);
+
+                from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
             } else {
                 from = 0;
             }
