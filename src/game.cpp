@@ -431,7 +431,7 @@ struct move Game::parseMove(std::string move) {
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
 
-            if (from != (1 << __builtin_ctzll(from))) {
+            if (from != (1ULL << __builtin_ctzll(from))) {
                 // In this case there are multiple pieces on the same rank/file but only one possible move
                 std::vector<Bitboard> split = splitBoard(from);
                 struct move m;
@@ -452,7 +452,7 @@ struct move Game::parseMove(std::string move) {
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
 
-            if (from != (1 << __builtin_ctzll(from))) {
+            if (from != (1ULL << __builtin_ctzll(from))) {
                 // In this case there are multiple pieces on the same diagonal but only one possible move
                 std::vector<Bitboard> split = splitBoard(from);
                 struct move m;
@@ -472,7 +472,7 @@ struct move Game::parseMove(std::string move) {
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
 
-            if (from != (1 << __builtin_ctzll(from))) {
+            if (from != (1ULL << __builtin_ctzll(from))) {
                 // In this case there are multiple pieces on the same diagonal but only one possible move
                 std::vector<Bitboard> split = splitBoard(from);
                 struct move m;
