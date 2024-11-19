@@ -300,6 +300,12 @@ bool Game::makeMove(struct move move) {
         board.bitboards[std::make_pair(move.colour, King)] ^= move.from | kingPos;
 
         board.empty ^= move.from | rookPos | kingPos | corner;
+    } else if (move.type == Promotion) {
+        board.bitboards[std::make_pair(move.colour, Pawn)] ^= move.from;
+        board.bitboards[std::make_pair(move.colour, move.promotionPiece)] |= move.to;
+
+        board.empty ^= move.to;
+        board.empty |= move.from;
     }
 
     // Logic for loss of castling right
@@ -353,10 +359,12 @@ struct move Game::parseMove(std::string move) {
 
     Bitboard to;
 
-    try {
-        to = getSquare(move.substr(move.length() - 2, 2));
-    } catch (std::string e) {
-        throw std::invalid_argument("Square could not be parsed");
+    if (move.find('=') == std::string::npos) {
+        try {
+            to = getSquare(move.substr(move.length() - 2, 2));
+        } catch (std::string e) {
+            throw std::invalid_argument("Square could not be parsed");
+        }
     }
 
     if (move.length() == 2) {
@@ -493,6 +501,17 @@ struct move Game::parseMove(std::string move) {
             }
 
             return {turn, piece, from, to, Capture, NullPiece};
+        } else if (move.find('=') != std::string::npos) {
+            try {
+                to = getSquare(move.substr(0, 2));
+            } catch (std::string e) {
+                throw std::invalid_argument("Square could not be parsed");
+            }
+            Piece promoPiece = pieceMap[move[3]];
+
+            Bitboard from = turn == White ? to >> 8 : to << 8;
+
+            return {turn, Pawn, from, to, Promotion, promoPiece};
         }
     }
 
