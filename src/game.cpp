@@ -343,12 +343,12 @@ struct move Game::parseMove(std::string move) {
         Bitboard from = turn == White ? 0b10000 : 0b10000ULL << 56;
         Bitboard to = turn == White ? 0b1000000 : 0b1000000ULL << 56;
 
-        return {turn, King, from, to, Castle};
+        return {turn, King, from, to, Castle, NullPiece};
     } else if (move == "O-O-O") {
         Bitboard from = turn == White ? 0b10000 : 0b10000ULL << 56;
         Bitboard to = turn == White ? 0b100 : 0b100ULL << 56;
 
-        return {turn, King, from, to, Castle};
+        return {turn, King, from, to, Castle, NullPiece};
     }
 
     Bitboard to;
@@ -378,7 +378,7 @@ struct move Game::parseMove(std::string move) {
             }
         }
 
-        return {turn, Pawn, from, to, Peaceful};
+        return {turn, Pawn, from, to, Peaceful, NullPiece};
     } else if (move.length() == 3) {
         // The case where the move is a peaceful move with a non-pawn piece
         Piece piece = pieceMap[move[0]];
@@ -396,7 +396,7 @@ struct move Game::parseMove(std::string move) {
                 struct move m;
 
                 for (auto b : split) {
-                    m = {turn, Rook, b, to, Peaceful};
+                    m = {turn, Rook, b, to, Peaceful, NullPiece};
 
                     if (moveValid(m)) {
                         return m;
@@ -417,7 +417,7 @@ struct move Game::parseMove(std::string move) {
                 struct move m;
 
                 for (auto b : split) {
-                    m = {turn, Bishop, b, to, Peaceful};
+                    m = {turn, Bishop, b, to, Peaceful, NullPiece};
 
                     if (moveValid(m)) {
                         return m;
@@ -437,7 +437,7 @@ struct move Game::parseMove(std::string move) {
                 struct move m;
 
                 for (auto b : split) {
-                    m = {turn, Queen, b, to, Peaceful};
+                    m = {turn, Queen, b, to, Peaceful, NullPiece};
 
                     if (moveValid(m)) {
                         return m;
@@ -454,9 +454,9 @@ struct move Game::parseMove(std::string move) {
             from = 0;
         }
 
-        return {turn, piece, from, to, Peaceful};
+        return {turn, piece, from, to, Peaceful, NullPiece};
     } else if (move.length() == 4) {
-        // In this case it is either a peaceful ambiguous move or a capture
+        // In this case it is either a peaceful ambiguous move or a capture, or a promotion
 
         if (move.find('x') != std::string::npos) {
             // Capture case
@@ -492,7 +492,7 @@ struct move Game::parseMove(std::string move) {
                 from = possibleFroms & fileMask((int)file - (int)'a');
             }
 
-            return {turn, piece, from, to, Capture};
+            return {turn, piece, from, to, Capture, NullPiece};
         }
     }
 

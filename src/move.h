@@ -16,4 +16,5 @@ struct move {
     Bitboard from;
     Bitboard to;
     MoveType type;
+    Piece promotionPiece;
 };
