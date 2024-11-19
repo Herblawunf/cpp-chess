@@ -510,16 +510,64 @@ struct move Game::parseMove(std::string move) {
                 Bitboard possibleFroms = rankMask(square) | fileMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+
+                if (from != (1ULL << __builtin_ctzll(from))) {
+                    // In this case there are multiple pieces on the same diagonal but only one possible move
+                    std::vector<Bitboard> split = splitBoard(from);
+                    struct move m;
+
+                    for (auto b : split) {
+                        m = {turn, Bishop, b, to, Peaceful, NullPiece};
+
+                        if (moveValid(m)) {
+                            return m;
+                        }
+                    }
+                    return m;
+                }
+
             } else if (piece == Bishop) {
                 int square = __builtin_ctzll(to);
                 Bitboard possibleFroms = diagonalMask(square) | antiDiagMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+
+                if (from != (1ULL << __builtin_ctzll(from))) {
+                    // In this case there are multiple pieces on the same diagonal but only one possible move
+                    std::vector<Bitboard> split = splitBoard(from);
+                    struct move m;
+
+                    for (auto b : split) {
+                        m = {turn, Bishop, b, to, Peaceful, NullPiece};
+
+                        if (moveValid(m)) {
+                            return m;
+                        }
+                    }
+                    return m;
+                }
+
             } else if (piece == Queen) {
                 int square = __builtin_ctzll(to);
                 Bitboard possibleFroms = rankMask(square) | fileMask(square) | diagonalMask(square) | antiDiagMask(square);
 
                 from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+
+                if (from != (1ULL << __builtin_ctzll(from))) {
+                    // In this case there are multiple pieces on the same diagonal but only one possible move
+                    std::vector<Bitboard> split = splitBoard(from);
+                    struct move m;
+
+                    for (auto b : split) {
+                        m = {turn, Bishop, b, to, Peaceful, NullPiece};
+
+                        if (moveValid(m)) {
+                            return m;
+                        }
+                    }
+                    return m;
+                }
+
             } else if (piece == Knight) {
                 int square = __builtin_ctzll(to);
                 Bitboard possibleFroms = knightMask(square);
