@@ -1,3 +1,4 @@
+#include <vector>
 #include "bitboards.h"
 
 const Bitboard notAFile = 0xfefefefefefefefe;
@@ -206,4 +207,16 @@ Bitboard knightMask(int sq) {
     return nortOne(noEaOne(b)) | eastOne(noEaOne(b)) | eastOne(soEaOne(b)) | soutOne(soEaOne(b)) | soutOne(soWeOne(b))
         | westOne(soWeOne(b)) | westOne(noWeOne(b)) | nortOne(noWeOne(b));
 
+}
+
+std::vector<Bitboard> splitBoard(Bitboard b) {
+    std::vector<Bitboard> ret = {};
+
+    for (int i = 0; i < 64; i++) {
+        if (b & (1 << i)) {
+            ret.push_back(1 << i);
+        }
+    }
+
+    return ret;
 }

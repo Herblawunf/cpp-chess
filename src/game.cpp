@@ -389,6 +389,22 @@ struct move Game::parseMove(std::string move) {
             Bitboard possibleFroms = rankMask(square) | fileMask(square);
 
             from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+
+            if (from != (1 << __builtin_ctzll(from))) {
+                // In this case there are multiple pieces on the same rank/file but only one possible move
+                std::vector<Bitboard> split = splitBoard(from);
+                struct move m;
+
+                for (auto b : split) {
+                    m = {turn, Rook, b, to, Peaceful};
+
+                    if (moveValid(m)) {
+                        return m;
+                    }
+                }
+                return m;
+            }
+
         } else if (piece == Bishop) {
             int square = __builtin_ctzll(to);
             Bitboard possibleFroms = diagonalMask(square) | antiDiagMask(square);

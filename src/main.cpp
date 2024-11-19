@@ -9,8 +9,6 @@ using namespace std;
 int main() {
     cout << "Program starting..." << endl;
 
-
-
     TwoPlayerGame game;
 
     game.init();

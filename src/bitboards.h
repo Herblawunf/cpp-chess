@@ -29,3 +29,5 @@ Bitboard diagonalMask(int sq);
 Bitboard antiDiagMask(int sq);
 
 Bitboard knightMask(int sq);
+
+std::vector<Bitboard> splitBoard(Bitboard b);
