@@ -7,7 +7,7 @@ class Game {
 public:
     void init();
     bool makeMove(struct move move);
-    void printBoard();
+    void printBoard() const;
     bool moveValid(struct move move);
     struct move parseMove(std::string move);
     Board board;

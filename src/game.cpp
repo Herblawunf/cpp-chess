@@ -8,7 +8,7 @@ void Game::init() {
 }
 
 bool Game::moveValid(struct move move) {
-    if (move.colour != turn) {
+    if (move.colour != turn || move.to == move.from) {
         return false;
     }
 
@@ -104,7 +104,7 @@ bool Game::moveValid(struct move move) {
             return false;
         }
 
-        std::cout << between << std::endl << board.empty << std::endl;
+        std::cout << (move.to & move.from) << std::endl;
 
         if (move.type == Peaceful) {
             // There should be no pieces along the path
@@ -113,7 +113,7 @@ bool Game::moveValid(struct move move) {
             }
         } else if (move.type == Capture) {
             // There should be no pieces in between the two pieces
-            if (((between ^ (move.to & move.from)) & board.empty) != (between ^ (move.to & move.from))) {
+            if (((between ^ (move.to | move.from)) & board.empty) != (between ^ (move.to | move.from))) {
                 return false;
             }
 
@@ -146,13 +146,25 @@ bool Game::makeMove(struct move move) {
 
         board.empty ^= move.to;
         board.empty |= move.from;
+    } else if (move.type == Capture) {
+        board.bitboards[std::make_pair(move.colour, move.piece)] ^= move.from;
+        board.bitboards[std::make_pair(move.colour, move.piece)] |= move.to;
+
+        for (int p = Pawn; p <= King; p++) {
+            if (board.bitboards[std::make_pair(opposite(move.colour), static_cast<Piece>(p))] & move.to) {
+                board.bitboards[std::make_pair(opposite(move.colour), static_cast<Piece>(p))] ^= move.to;
+                break;
+            }
+        }
+
+        board.empty |= move.from;
     }
 
     turn = turn == Black ? White : Black;
     return true;
 }
 
-void Game::printBoard() {
+void Game::printBoard() const {
     std::cout << board;
 }
 
@@ -202,6 +214,25 @@ struct move Game::parseMove(std::string move) {
         }
 
         return {turn, piece, from, to, Peaceful};
+    } else if (move.length() == 4) {
+        // In this case it is either a peaceful ambiguous move or a capture
+
+        if (move.find('x') != std::string::npos) {
+            // Capture case
+            Piece piece = pieceMap[move[0]];
+            Bitboard from;
+
+            if (piece == Rook) {
+                int square = __builtin_ctzll(to);
+                Bitboard possibleFroms = rankMask(square) | fileMask(square);
+
+                from = possibleFroms & board.bitboards[std::make_pair(turn, piece)];
+            } else {
+                from = 0;
+            }
+
+            return {turn, piece, from, to, Capture};
+        }
     }
 
     throw std::invalid_argument("Move could not be parsed");
