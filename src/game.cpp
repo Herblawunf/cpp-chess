@@ -288,10 +288,43 @@ bool Game::makeMove(struct move move) {
             kingPos = 0b1000000ULL << 56;
         }
 
+        if (move.colour == White) {
+            whiteQueenSideCastle = false;
+            whiteKingSideCastle = false;
+        } else if (move.colour == Black) {
+            blackQueenSideCastle = false;
+            blackKingSideCastle = false;
+        }
+
         board.bitboards[std::make_pair(move.colour, Rook)] ^= corner | rookPos;
         board.bitboards[std::make_pair(move.colour, King)] ^= move.from | kingPos;
 
         board.empty ^= move.from | rookPos | kingPos | corner;
+    }
+
+    // Logic for loss of castling right
+    if (move.colour == White) {
+        if (move.piece == King && move.from == 0b10000) {
+            whiteQueenSideCastle = false;
+            whiteKingSideCastle = false;
+        }
+        else if (move.piece == Rook && move.from == 1) {
+            whiteQueenSideCastle = false;
+        }
+        else if (move.piece == Rook && move.from == 0b10000000) {
+            whiteKingSideCastle = false;
+        }
+    } else if (move.colour == Black) {
+        if (move.piece == King && move.from == 0b10000ULL << 56) {
+            blackQueenSideCastle = false;
+            blackKingSideCastle = false;
+        }
+        else if (move.piece == Rook && move.from == 1ULL << 56) {
+            blackQueenSideCastle = false;
+        }
+        else if (move.piece == Rook && move.from == 0b10000000ULL << 56) {
+            blackKingSideCastle = false;
+        }
     }
 
     turn = turn == Black ? White : Black;
