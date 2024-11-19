@@ -12,4 +12,9 @@ public:
     struct move parseMove(std::string move);
     Board board;
     Colour turn;
+private:
+    bool whiteKingSideCastle;
+    bool whiteQueenSideCastle;
+    bool blackKingSideCastle;
+    bool blackQueenSideCastle;
 };

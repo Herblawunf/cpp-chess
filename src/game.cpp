@@ -5,6 +5,11 @@
 void Game::init() {
     board.init();
     turn = White;
+
+    whiteKingSideCastle = true;
+    whiteQueenSideCastle = true;
+    blackKingSideCastle = true;
+    blackQueenSideCastle = true;
 }
 
 bool Game::moveValid(struct move move) {
@@ -24,15 +29,63 @@ bool Game::moveValid(struct move move) {
                 westOne(move.from) | noWeOne(move.from);
 
         // Checks that the to square is one of the valid move positions
-        if (!(move.to & validPositions)) {
+        if (move.type != Castle && !(move.to & validPositions)) {
             return false;
         }
 
-        if (move.type == Peaceful && piece.second != NullPiece) {
-            return false;
-        } else if (move.type == Capture && (piece.second == NullPiece or piece.first == move.colour)) {
+        if (move.type == Peaceful) {
+            if (piece.second != NullPiece) {
+                return false;
+            }
+        } else if (move.type == Capture) {
+            if (piece.second == NullPiece or piece.first == move.colour) {
+                return false;
+            }
+        } else if (move.type == Castle) {
+            if (move.colour == White) {
+                // The from square should be the starting king square
+                if (move.from != 0b10000) {
+                    return false;
+                }
+
+                if (move.to == 0b1000000) {
+                    // Kingside castle
+                    std::cout << (0b1100000 & board.empty) << std::endl;
+                    if ((!whiteKingSideCastle) || (0b1100000 & board.empty) != 0b1100000) {
+                        return false;
+                    }
+                } else if (move.to == 0b100) {
+                    // Queenside castle
+                    if ((!whiteQueenSideCastle) || (0b1110 & board.empty) != 0b1110) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                // The from square should be the starting king square
+                if (move.from != 0b10000ULL << 56) {
+                    return false;
+                }
+
+                if (move.to == 0b1000000ULL << 56) {
+                    // Kingside castle
+                    if ((!blackKingSideCastle) || ((0b1100000ULL << 56) & board.empty) != (0b1100000ULL << 56)) {
+                        return false;
+                    }
+                } else if (move.to == 0b100ULL << 56) {
+                    // Queenside castle
+                    if ((!blackQueenSideCastle) || ((0b1110ULL << 56) & board.empty) != (0b1110ULL << 56)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        } else {
             return false;
         }
+
     } else if (move.piece == Pawn) {
         if (move.type == Peaceful) {
             if (!(move.to & board.empty)) {
@@ -212,6 +265,33 @@ bool Game::makeMove(struct move move) {
         }
 
         board.empty |= move.from;
+    } else if (move.type == Castle) {
+        Bitboard corner;
+        Bitboard rookPos;
+        Bitboard kingPos;
+
+        if (move.to == 0b100) {
+            corner = 1;
+            rookPos = 0b1000;
+            kingPos = 0b100;
+        } else if (move.to == 0b1000000) {
+            corner = 0b10000000;
+            rookPos = 0b100000;
+            kingPos = 0b1000000;
+        } else if (move.to == 0b100ULL << 56) {
+            corner = 1ULL << 56;
+            rookPos = 0b1000ULL << 56;
+            kingPos = 0b100ULL << 56;
+        } else {
+            corner = 0b10000000ULL << 56;
+            rookPos = 0b100000ULL << 56;
+            kingPos = 0b1000000ULL << 56;
+        }
+
+        board.bitboards[std::make_pair(move.colour, Rook)] ^= corner | rookPos;
+        board.bitboards[std::make_pair(move.colour, King)] ^= move.from | kingPos;
+
+        board.empty ^= move.from | rookPos | kingPos | corner;
     }
 
     turn = turn == Black ? White : Black;
@@ -225,6 +305,19 @@ void Game::printBoard() const {
 std::map<char, Piece> pieceMap{{'K', King}, {'Q', Queen}, {'R', Rook}, {'B', Bishop}, {'N', Knight}};
 
 struct move Game::parseMove(std::string move) {
+    if (move == "O-O") {
+        // Kingside castle
+        Bitboard from = turn == White ? 0b10000 : 0b10000ULL << 56;
+        Bitboard to = turn == White ? 0b1000000 : 0b1000000ULL << 56;
+
+        return {turn, King, from, to, Castle};
+    } else if (move == "O-O-O") {
+        Bitboard from = turn == White ? 0b10000 : 0b10000ULL << 56;
+        Bitboard to = turn == White ? 0b100 : 0b100ULL << 56;
+
+        return {turn, King, from, to, Castle};
+    }
+
     Bitboard to;
 
     try {
