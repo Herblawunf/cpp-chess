@@ -213,10 +213,21 @@ std::vector<Bitboard> splitBoard(Bitboard b) {
     std::vector<Bitboard> ret = {};
 
     for (int i = 0; i < 64; i++) {
-        if (b & (1 << i)) {
-            ret.push_back(1 << i);
+        if (b & (1ULL << i)) {
+            ret.push_back(1ULL << i);
         }
     }
 
     return ret;
+}
+
+int fileIndex(Bitboard b) {
+    Bitboard file = 0x101010101010101ULL;
+
+    for (int i = 0; i < 8; i++) {
+        if (b & (file << i)) {
+            return i;
+        }
+    }
+    return -1;
 }

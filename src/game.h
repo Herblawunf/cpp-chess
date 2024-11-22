@@ -17,4 +17,7 @@ private:
     bool whiteQueenSideCastle;
     bool blackKingSideCastle;
     bool blackQueenSideCastle;
+
+    bool enPassantPossible;
+    int lastTwoMoveFile;
 };

@@ -10,6 +10,9 @@ void Game::init() {
     whiteQueenSideCastle = true;
     blackKingSideCastle = true;
     blackQueenSideCastle = true;
+
+    enPassantPossible = false;
+    lastTwoMoveFile = -1;
 }
 
 bool Game::moveValid(struct move move) {
@@ -114,8 +117,17 @@ bool Game::moveValid(struct move move) {
                 return false;
             }
 
+            // En Passant case
+            if (board.empty & move.to) {
+                if (!(enPassantPossible && lastTwoMoveFile == fileIndex(move.to))) {
+                    if ((move.colour == White && !(move.to & (0xFFULL << 40))) ||
+                        (move.colour == Black && !(move.to & (0xFFULL << 16)))) {
+                        return false;
+                    }
+                }
+            }
             // There should be an opposite coloured piece on the target square
-            if (piece.first == move.colour || piece.first == NullColour) {
+            else if (piece.first == move.colour || piece.first == NullColour) {
                 return false;
             }
 
@@ -268,6 +280,14 @@ bool Game::makeMove(struct move move) {
 
     Bitboard pieces = board.bitboards[std::make_pair(move.colour, move.piece)];
 
+    // En passant can be possible if there was a two rank pawn move
+    if (move.type == Peaceful && move.piece == Pawn && (move.to == move.from << 16 || move.to == move.from >> 16)) {
+        enPassantPossible = true;
+        lastTwoMoveFile = fileIndex(move.to);
+    } else {
+        enPassantPossible = false;
+    }
+
     if (move.type == Peaceful) {
         board.bitboards[std::make_pair(move.colour, move.piece)] ^= move.from;
         board.bitboards[std::make_pair(move.colour, move.piece)] |= move.to;
@@ -283,6 +303,13 @@ bool Game::makeMove(struct move move) {
                 board.bitboards[std::make_pair(opposite(move.colour), static_cast<Piece>(p))] ^= move.to;
                 break;
             }
+        }
+
+        // Only true when capture is En Passant
+        if (board.empty & move.to) {
+            Bitboard capturedPiecePosition = (eastOne(move.from) | westOne(move.from)) & (soutOne(move.to) | nortOne(move.to));
+
+            board.bitboards[std::make_pair(opposite(move.colour), Pawn)] ^= capturedPiecePosition;
         }
 
         board.empty |= move.from;
